@@ -46754,7 +46754,7 @@ GameObject:
   - component: {fileID: 2030095143}
   - component: {fileID: 2030095142}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46774,7 +46774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 2030095143}
   anim: {fileID: 0}
-  speed: 12
+  speed: 5
   rotationSpeed: 120
   gravity: -9.18
   jumpHeight: 3
