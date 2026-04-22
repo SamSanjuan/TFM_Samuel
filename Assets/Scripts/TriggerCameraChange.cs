@@ -13,6 +13,7 @@ public class TriggerCameraChange : MonoBehaviour
         {
             cameraAct.SetActive(true);
             cameraDes.SetActive(false);
+            Debug.Log("cambiocamara");
         }
     }
 }
