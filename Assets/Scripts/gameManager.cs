@@ -5,4 +5,9 @@ using UnityEngine;
 public class gameManager : MonoBehaviour
 {
     public bool canMove;
+
+    [Header ("Condiciones Del Juego")]
+    public int coins = 0;
+    public bool hasKey = false;
+    public bool playerIsHidden;
 }
