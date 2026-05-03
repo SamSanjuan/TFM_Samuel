@@ -7,7 +7,6 @@ public class ExitTrigger : MonoBehaviour
     public gameManager gm;
     private bool capTrigger = false;
     public GameObject candadoImg;
-    public GameObject openImg;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -34,7 +33,7 @@ public class ExitTrigger : MonoBehaviour
 
     private IEnumerator transitions()
     {
-        openImg.SetActive(true);
+        //cargar siguiente escena
         yield return new WaitForSeconds(1);
         // cargar siguiente escena
     }

@@ -12,8 +12,11 @@ public class PlayerMovement : MonoBehaviour
     public float rotationSpeed = 120f;
     public float gravity = -9.18f;
     public float jumpHeight = 3f;
+    public float runSpeed = 7;
 
     Vector3 velocity;
+
+    private float x, y;
     //bool isGrounded;
 
     //public Transform groundCheck;
@@ -27,7 +30,16 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        movementController(gm.canMove);
+        //movementController(gm.canMove);
+
+        x = Input.GetAxis("Horizontal");
+        y = Input.GetAxis("Vertical");
+
+        transform.Rotate(0, x * Time.deltaTime * rotationSpeed,0);
+        transform.Translate(0, 0, y * Time.deltaTime * runSpeed);
+
+        anim.SetFloat("VelX", x);
+        anim.SetFloat("VelY", y);
     }
 
     public void movementController(bool canMove)
@@ -45,12 +57,14 @@ public class PlayerMovement : MonoBehaviour
             float z = Input.GetAxis("Vertical");
 
             //Vector3 move = transform.right * x + transform.forward * z;
-            Vector3 move = transform.right * z;
+            Vector3 move = transform.forward * z;
             Vector3 rotate = Vector3.up * x;
 
             controller.Move(move * speed * Time.deltaTime);
             transform.Rotate(rotate * rotationSpeed *Time.deltaTime);
-            
+
+            anim.SetFloat("VelX", x);
+            anim.SetFloat("VelY", z);
 
             bool isWalking = (x != 0 || z != 0);
             //anim.SetBool("walk", isWalking);

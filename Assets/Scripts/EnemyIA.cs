@@ -10,6 +10,7 @@ public class EnemyIA : MonoBehaviour
     public Transform player;
     public gameManager gm;
     private NavMeshAgent agent;
+    public Animator anim;
 
     [Header("ChaseSettins")]
     public bool isChasing = false;
@@ -29,7 +30,9 @@ public class EnemyIA : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
         ChooseNewZone();
+        anim.SetTrigger("run");
     }
 
     void Update()
@@ -37,10 +40,11 @@ public class EnemyIA : MonoBehaviour
         if (waiting)
         {
             waitTimer += Time.deltaTime;
-
+            
             if (waitTimer >= waitTime)
             {
                 waiting = false;
+                anim.SetTrigger("run");
                 GoToNextPoint();
             }
 
@@ -51,6 +55,7 @@ public class EnemyIA : MonoBehaviour
         {
             waiting = true;
             waitTimer = 0f;
+            anim.SetTrigger("idle");
         }
     }
 
