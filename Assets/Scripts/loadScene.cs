@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class loadScene : MonoBehaviour
 {
-    public void loadNextScene()
+    public void loadNextScene(int number)
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(number);
         Debug.Log("sig escena");
     }
 
