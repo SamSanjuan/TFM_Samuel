@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
 
     Vector3 velocity;
 
-    private float x, y;
+    //private float x, y;
     //bool isGrounded;
 
     //public Transform groundCheck;
@@ -24,22 +24,14 @@ public class PlayerMovement : MonoBehaviour
     //public LayerMask groundMask;
 
     public gameManager gm;
+    public EnemyIA eIA;
 
     //bool capCorEmpuje = true;
 
     // Update is called once per frame
     void Update()
     {
-        //movementController(gm.canMove);
-
-        x = Input.GetAxis("Horizontal");
-        y = Input.GetAxis("Vertical");
-
-        transform.Rotate(0, x * Time.deltaTime * rotationSpeed,0);
-        transform.Translate(0, 0, y * Time.deltaTime * runSpeed);
-
-        anim.SetFloat("VelX", x);
-        anim.SetFloat("VelY", y);
+        movementController(gm.canMove);
     }
 
     public void movementController(bool canMove)
@@ -59,14 +51,16 @@ public class PlayerMovement : MonoBehaviour
             //Vector3 move = transform.right * x + transform.forward * z;
             Vector3 move = transform.forward * z;
             Vector3 rotate = Vector3.up * x;
-
+            if (z < 0) z = 0;
             controller.Move(move * speed * Time.deltaTime);
             transform.Rotate(rotate * rotationSpeed *Time.deltaTime);
+
 
             anim.SetFloat("VelX", x);
             anim.SetFloat("VelY", z);
 
             bool isWalking = (x != 0 || z != 0);
+
             //anim.SetBool("walk", isWalking);
             /*
             if (Input.GetButtonDown("Jump") && isGrounded)
