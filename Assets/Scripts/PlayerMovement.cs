@@ -7,28 +7,25 @@ public class PlayerMovement : MonoBehaviour
     [Header("Referencias")]
     public CharacterController controller;
     public Animator anim;
+    public AudioSource audioSource;
 
+    [Header("Movimiento")]
     public float speed = 12f;
     public float rotationSpeed = 120f;
     public float gravity = -9.18f;
-    public float jumpHeight = 3f;
-    public float runSpeed = 7;
+
+    [Header("Pasos")]
+    public AudioClip[] footstepSounds;
+    public float stepInterval = 0.5f;
+
+    private float stepTimer;
+    private int lastStepIndex = -1;
 
     Vector3 velocity;
-
-    //private float x, y;
-    //bool isGrounded;
-
-    //public Transform groundCheck;
-    //public float groundDistance = 0.4f;
-    //public LayerMask groundMask;
 
     public gameManager gm;
     public EnemyIA eIA;
 
-    //bool capCorEmpuje = true;
-
-    // Update is called once per frame
     void Update()
     {
         movementController(gm.canMove);
@@ -37,41 +34,57 @@ public class PlayerMovement : MonoBehaviour
     public void movementController(bool canMove)
     {
         if (canMove)
-        {/*
-            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-            if (isGrounded && velocity.y < 0)
-            {
-                velocity.y = -2f;
-            }*/
-
+        {
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
 
-            //Vector3 move = transform.right * x + transform.forward * z;
+            if (z < 0) z = 0;
             Vector3 move = transform.forward * z;
             Vector3 rotate = Vector3.up * x;
-            if (z < 0) z = 0;
-            controller.Move(move * speed * Time.deltaTime);
-            transform.Rotate(rotate * rotationSpeed *Time.deltaTime);
 
+            controller.Move(move * speed * Time.deltaTime);
+            transform.Rotate(rotate * rotationSpeed * Time.deltaTime);
 
             anim.SetFloat("VelX", x);
             anim.SetFloat("VelY", z);
 
             bool isWalking = (x != 0 || z != 0);
 
-            //anim.SetBool("walk", isWalking);
-            /*
-            if (Input.GetButtonDown("Jump") && isGrounded)
+            if (isWalking)
             {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
-            }*/
+                stepTimer -= Time.deltaTime;
 
+                if (stepTimer <= 0)
+                {
+                    PlayFootstep();
+                    stepTimer = stepInterval;
+                }
+            }
+            else
+            {
+                stepTimer = 0;
+            }
             velocity.y += gravity * Time.deltaTime;
-
             controller.Move(velocity * Time.deltaTime);
         }
     }
+
+    void PlayFootstep()
+    {
+        if (footstepSounds.Length == 0) return;
+
+        int randomIndex;
+
+        do
+        {
+            randomIndex = Random.Range(0, footstepSounds.Length);
+        }
+        while (randomIndex == lastStepIndex);
+
+        lastStepIndex = randomIndex;
+
+        audioSource.PlayOneShot(footstepSounds[randomIndex]);
+    }
 }
+
 

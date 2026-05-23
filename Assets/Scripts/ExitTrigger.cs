@@ -7,12 +7,14 @@ public class ExitTrigger : MonoBehaviour
     public gameManager gm;
     private bool capTrigger = false;
     public GameObject candadoImg;
+    public AudioManager am;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !capTrigger)
         {
             candadoImg.SetActive(true);
+            am.candadoSound.Play();
         }
 
         if (other.CompareTag("Player") && !capTrigger && gm.hasKey)
@@ -33,7 +35,7 @@ public class ExitTrigger : MonoBehaviour
 
     private IEnumerator transitions()
     {
-        //cargar siguiente escena
+        gm.endGame(true);
         yield return new WaitForSeconds(1);
         // cargar siguiente escena
     }

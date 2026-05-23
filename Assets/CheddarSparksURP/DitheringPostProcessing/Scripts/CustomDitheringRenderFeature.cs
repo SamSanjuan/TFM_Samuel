@@ -1,6 +1,4 @@
-#if UNITY_2023_3_OR_NEWER
-#define USE_RENDER_GRAPH
-#endif
+//#define USE_RENDER_GRAPH
 
 using UnityEngine;
 using UnityEngine.Rendering;

@@ -10,10 +10,14 @@ public class EnemyIA : MonoBehaviour
     public gameManager gm;
     private NavMeshAgent agent;
     public Animator anim;
+    public AudioManager am;
 
     [Header("ChaseSettins")]
     public bool canChase = false;
     public float chaseDistance = 5f;
+    public float capChaseTimer;
+    public float timerTochase;
+    public float cachDistance = 3;
 
     [Header("WayPoints")]
     public Transform[] zones; 
@@ -30,7 +34,8 @@ public class EnemyIA : MonoBehaviour
     public int actualPointToStalk;
     public Transform[] pointToStalk;
     public float waitTimeStalk = 5f;
-    private float timerStalkCount;
+    public float timerStalkCount;
+    public float distanceToStalkPoint;
 
     public enum EnemyState
     {
@@ -46,9 +51,9 @@ public class EnemyIA : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
 
-        currentState = EnemyState.Chase;
+        //currentState = EnemyState.Chase;
         ChooseNewZone();
-
+        //ChangeState(EnemyState.Patrol);
         anim.SetTrigger("run");
     }
 
@@ -56,8 +61,16 @@ public class EnemyIA : MonoBehaviour
     {
         DetectPlayer();
         StateManager();
+        resetCanChase();
     }
+    public void ChangeState(EnemyState newState)
+    {
+        if (currentState == newState) return;
 
+        currentState = newState;
+
+        am.ChangeMusic(currentState);
+    }
     void ChooseNewZone()
     {
         // elegir zona alea
@@ -83,7 +96,6 @@ public class EnemyIA : MonoBehaviour
 
         currentPointIndex++;
 
-        // si termina la zona  cambia a otra
         if (currentPointIndex >= currentPoints.Length)
         {
             ChooseNewZone();
@@ -98,11 +110,12 @@ public class EnemyIA : MonoBehaviour
         Debug.Log("estoy detectando");
         
         float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
-        Debug.Log("Distancia Enemy -> Player: " + distanceToPlayer);
+        //Debug.Log("Distancia Enemy -> Player: " + distanceToPlayer);
 
         if (distanceToPlayer <= chaseDistance)
         {
-            currentState = EnemyState.Chase;
+            //currentState = EnemyState.Chase;
+            ChangeState(EnemyState.Chase);
             Debug.Log("Te pille");
         }
         
@@ -116,6 +129,11 @@ public class EnemyIA : MonoBehaviour
     private void ChaseToPlayer()
     {
         agent.destination = player.transform.position;
+
+        if(Vector3.Distance(agent.transform.position, player.transform.position) <= cachDistance)
+        {
+            gm.endGame(false);
+        }
     }
 
     public void EnemyPatrolState()
@@ -134,35 +152,52 @@ public class EnemyIA : MonoBehaviour
             return;
         }
 
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        if (!agent.pathPending && agent.remainingDistance < distanceToStalkPoint)
         {
             waiting = true;
             waitTimer = 0f;
             anim.SetTrigger("idle");
         }
-    }
+    }  
 
+    
     public void EnemyStalkState(int actualPoint)
     {
         agent.destination = pointToStalk[actualPoint].position;
 
-        if(Vector3.Distance(agent.transform.position, pointToStalk[actualPoint].position) < 0.5)
+        if (Vector3.Distance(agent.transform.position, pointToStalk[actualPoint].position) < 5f)
         {
             timerStalkCount += Time.deltaTime;
 
-            if(timerStalkCount >= waitTimeStalk)
+            if (timerStalkCount >= waitTimeStalk)
             {
+                canChase = false;
+                am.endHidingMusic.Play();
                 ChooseNewZone();
-                currentState = EnemyState.Patrol;
+                StartCoroutine(resetCanChase());
+                ChangeState(EnemyState.Patrol);
             }
         }
+        /*
+        else
+        {
+            timerStalkCount = 0f;
+        }*/
     }
+
+    private IEnumerator resetCanChase()
+    {
+        yield return new WaitForSeconds(timerTochase);
+        canChase = true;   
+    }
+
 
     public void ChangeStalkState(int point)
     {
         actualPointToStalk = point;
         timerStalkCount = 0f;
-        currentState = EnemyState.Stalk;
+        ChangeState(EnemyState.Stalk);
+        //currentState = EnemyState.Stalk;
         
     }
 
@@ -184,5 +219,14 @@ public class EnemyIA : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(agent.transform.position, cachDistance);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(agent.transform.position, chaseDistance);
     }
 }
