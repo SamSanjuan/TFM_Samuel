@@ -19,6 +19,14 @@ public class EnemyIA : MonoBehaviour
     public float timerTochase;
     public float cachDistance = 3;
 
+    [Header("Chase Speed")]
+    public float chaseTimeToBoost = 15f;
+    public float boostedSpeed = 6f;
+
+    public float chaseTimer;
+    public bool speedBoosted = false;
+    private float baseSpeed;
+
     [Header("WayPoints")]
     public Transform[] zones; 
     public float waitTime = 2f;
@@ -36,6 +44,12 @@ public class EnemyIA : MonoBehaviour
     public float waitTimeStalk = 5f;
     public float timerStalkCount;
     public float distanceToStalkPoint;
+
+    private bool stalkIdle = false;
+
+    [Header("FootSteps")]
+    public AudioSource footStepSource;
+    public AudioClip[] footSteps;
 
     public enum EnemyState
     {
@@ -55,6 +69,9 @@ public class EnemyIA : MonoBehaviour
         ChooseNewZone();
         //ChangeState(EnemyState.Patrol);
         anim.SetTrigger("run");
+
+        StartCoroutine(startChaseCor());
+        baseSpeed = agent.speed;
     }
 
     void Update()
@@ -68,6 +85,13 @@ public class EnemyIA : MonoBehaviour
         if (currentState == newState) return;
 
         currentState = newState;
+
+        if (newState != EnemyState.Chase)
+        {
+            chaseTimer = 0f;
+            speedBoosted = false;
+            agent.speed = baseSpeed;
+        }
 
         am.ChangeMusic(currentState);
     }
@@ -130,7 +154,15 @@ public class EnemyIA : MonoBehaviour
     {
         agent.destination = player.transform.position;
 
-        if(Vector3.Distance(agent.transform.position, player.transform.position) <= cachDistance)
+        chaseTimer += Time.deltaTime;
+
+        if (!speedBoosted && chaseTimer >= chaseTimeToBoost)
+        {
+            speedBoosted = true;
+            agent.speed = boostedSpeed;
+        }
+
+        if (Vector3.Distance(agent.transform.position, player.transform.position) <= cachDistance)
         {
             gm.endGame(false);
         }
@@ -165,8 +197,10 @@ public class EnemyIA : MonoBehaviour
     {
         agent.destination = pointToStalk[actualPoint].position;
 
-        if (Vector3.Distance(agent.transform.position, pointToStalk[actualPoint].position) < 5f)
+        if (Vector3.Distance(agent.transform.position, pointToStalk[actualPoint].position) < 1f)
         {
+            anim.SetBool("stalk", true);
+
             timerStalkCount += Time.deltaTime;
 
             if (timerStalkCount >= waitTimeStalk)
@@ -175,14 +209,10 @@ public class EnemyIA : MonoBehaviour
                 am.endHidingMusic.Play();
                 ChooseNewZone();
                 StartCoroutine(resetCanChase());
+                anim.SetBool("stalk", false);
                 ChangeState(EnemyState.Patrol);
             }
         }
-        /*
-        else
-        {
-            timerStalkCount = 0f;
-        }*/
     }
 
     private IEnumerator resetCanChase()
@@ -214,13 +244,31 @@ public class EnemyIA : MonoBehaviour
                 break;
             case EnemyState.Stalk:
                 EnemyStalkState(actualPointToStalk);
-                anim.SetTrigger("idle");
+                //anim.SetTrigger("run");
                 break;
             default:
                 break;
         }
     }
 
+    private IEnumerator startChaseCor()
+    {      
+        yield return new WaitForSeconds(5);
+        canChase = true;
+    }
+    public void PlayFootStep()
+    {
+        if (footSteps.Length == 0) return;
+
+        int randomIndex = Random.Range(0, footSteps.Length);
+
+        //footStepSource.pitch = Random.Range(0.9f, 1.1f); 
+        footStepSource.PlayOneShot(footSteps[randomIndex]);
+    }
+
+    /// <summary>
+    /// GIZMOS
+    /// </summary>
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;

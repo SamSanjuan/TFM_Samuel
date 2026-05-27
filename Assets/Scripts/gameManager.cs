@@ -36,6 +36,7 @@ public class gameManager : MonoBehaviour
                 antagonista.SetActive(false);
                 am.playerWin(true);
                 victoryPanel.SetActive(true);
+                pl.speed = 0;
 
             }
             else
@@ -46,6 +47,7 @@ public class gameManager : MonoBehaviour
                 canMove = false;
                 StartCoroutine(decreaseSpeed());
                 StartCoroutine(showDefeatPanel());
+                pl.speed = 0;
             }
             capFinishGame = true;
         }
