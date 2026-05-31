@@ -7,6 +7,7 @@ public class PickUpItem : MonoBehaviour
     public gameManager gm;
     private bool capTrigger = false;
     public GameObject coinImg;
+    public AudioSource sound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -14,6 +15,7 @@ public class PickUpItem : MonoBehaviour
         {
             gm.coins++;
             StartCoroutine(transitions());
+            sound.Play();
             capTrigger = true;
         }
     }
@@ -23,5 +25,6 @@ public class PickUpItem : MonoBehaviour
         coinImg.SetActive(true);
         yield return new WaitForSeconds(2);
         coinImg.SetActive(false);
+        Destroy(this.gameObject);
     }
 }

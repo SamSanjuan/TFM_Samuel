@@ -24,7 +24,17 @@ public class gameManager : MonoBehaviour
     public AudioManager am;
     public bool finishGame = false;
     public bool capFinishGame = false;
+    private bool pause = false;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return)) 
+        {
+            pause = !pause;
 
+            if (pause)Time.timeScale = 0f;
+            else Time.timeScale = 1f;
+        }
+    }
     public void endGame(bool victory)
     {
         if (!capFinishGame)

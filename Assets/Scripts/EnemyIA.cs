@@ -131,7 +131,7 @@ public class EnemyIA : MonoBehaviour
         if (currentState == EnemyState.Stalk) return;
         if (!canChase) return;
 
-        Debug.Log("estoy detectando");
+        //Debug.Log("estoy detectando");
         
         float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
         //Debug.Log("Distancia Enemy -> Player: " + distanceToPlayer);
@@ -140,7 +140,7 @@ public class EnemyIA : MonoBehaviour
         {
             //currentState = EnemyState.Chase;
             ChangeState(EnemyState.Chase);
-            Debug.Log("Te pille");
+            //Debug.Log("Te pille");
         }
         
         /*

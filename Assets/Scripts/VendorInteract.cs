@@ -8,12 +8,15 @@ public class VendorInteract : MonoBehaviour
     private bool capTrigger = false;
     public GameObject vendorImg;
     public GameObject keyImg;
+    public AudioSource sound;
+    public AudioSource sound2;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !capTrigger)
         {
             vendorImg.SetActive(true);
+            sound.Play();
         }
 
         if (other.CompareTag("Player") && !capTrigger && gm.coins == 3)
@@ -22,6 +25,7 @@ public class VendorInteract : MonoBehaviour
             StartCoroutine(transitions());
             gm.hasKey = true;
             capTrigger = true;
+            sound2.Play();
         }
     }
 
